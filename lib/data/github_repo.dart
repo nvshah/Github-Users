@@ -14,4 +14,9 @@ class GithubRepo{
     githubUsers = await Future.wait(await githubService.getGithubUsers());
     //githubUsers = await githubService.getGithubUsers();
   }
+
+  void toggleBookMark(String userLogin){
+    var user = githubUsers.firstWhere((user) => user.name == userLogin);
+    user.toogleBookmarkValue();
+  }
 }

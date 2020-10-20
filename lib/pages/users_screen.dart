@@ -12,7 +12,13 @@ class UsersScreen extends StatefulWidget {
 }
 
 class _UsersScreenState extends State<UsersScreen> {
-  
+
+  @override
+  void initState(){ 
+    super.initState();
+    _updateData(context);
+  }
+
   ///Update the data or refresh the data
   Future<void> _updateData(BuildContext context) async {
     try {
@@ -35,24 +41,38 @@ class _UsersScreenState extends State<UsersScreen> {
   Widget build(BuildContext context) {
     //github repository to get the data
     final githubRepo = Provider.of<GithubRepo>(context, listen: false);
-
-    return FutureBuilder(
-      future: _updateData(context),
-      builder: (ctxt, snapshot) =>
-          snapshot.connectionState == ConnectionState.waiting
-              ? Center(
-                  //Till we fetch the users
-                  child: CircularProgressIndicator(),
-                )
-              : RefreshIndicator(
-                  onRefresh: () => _updateData(context),
-                  //List of Users
-                  child: ListView.builder(
-                    itemCount: githubRepo.githubUsers.length,
-                    itemBuilder: (ctxt, index) =>
-                        UserCard(user: githubRepo.githubUsers[index]),
-                  ),
-                ),
+    // return FutureBuilder(
+    //   future: _updateData(context),
+    //   builder: (ctxt, snapshot) =>
+    //       snapshot.connectionState == ConnectionState.waiting
+    //           ? Center(
+    //               //Till we fetch the users
+    //               child: CircularProgressIndicator(),
+    //             )
+    //           : RefreshIndicator(
+    //               onRefresh: () => _updateData(context),
+    //               //List of Users
+    //               child: ListView.builder(
+    //                 itemCount: githubRepo.githubUsers.length,
+    //                 itemBuilder: (ctxt, index) => ChangeNotifierProvider.value(
+    //                   value: githubRepo.githubUsers[index],
+    //                   child: UserCard(),
+    //                 )
+    //                 //UserCard(user: githubRepo.githubUsers[index]),
+    //               ),
+    //             ),
+    // );
+    return RefreshIndicator(
+      onRefresh: () => _updateData(context),
+      //List of Users
+      child: ListView.builder(
+          itemCount: githubRepo.githubUsers.length,
+          itemBuilder: (ctxt, index) => ChangeNotifierProvider.value(
+                value: githubRepo.githubUsers[index],
+                child: UserCard(),
+              )
+          //UserCard(user: githubRepo.githubUsers[index]),
+          ),
     );
   }
 }

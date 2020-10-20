@@ -4,18 +4,20 @@ import 'package:provider/provider.dart';
 
 import '../../models/github_user.dart';
 import '../user_details_screen.dart';
+import '../../data/github_repo.dart';
 
 class UserCard extends StatelessWidget {
-  final GithubUser user;
   final int index;
+  final bool useCache;
 
   UserCard({
-    @required this.user,
     this.index,
+    this.useCache = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<GithubUser>(context);
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 8.0,
@@ -55,10 +57,15 @@ class UserCard extends StatelessWidget {
               //bookmark
               trailing: Consumer<GithubUser>(
                 builder: (ctxt, user, _) => IconButton(
-                  icon: Icon(Icons.bookmark),
+                  icon: Icon(user.isBookmarked ? Icons.bookmark : Icons.bookmark_border),
+                  color: Theme.of(context).accentColor,
                   onPressed: () {
                     //TODO Bookmark Toggling Logic
-                    user.toogleBookmarkValue();
+                    //Changes in local repository
+                    if(!useCache)
+                      user.toogleBookmarkValue();
+                    else
+                      Provider.of<GithubRepo>(context, listen: false).toggleBookMark(user.name);
                     //reflect changes locally
                     final githubBox = Hive.box('github');
                     if (user.isBookmarked)
