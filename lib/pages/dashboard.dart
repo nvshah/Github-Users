@@ -10,6 +10,24 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+
+  @override
+  void initState() {
+    super.initState();
+  }
+  
+  Widget buildShowMessage(String message) {
+    return Center(
+      child: Text(message),
+    );
+  }
+
+  Widget buildLoading() {
+    return Center(
+      child: CircularProgressIndicator(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -29,7 +47,7 @@ class _DashboardState extends State<Dashboard> {
           builder: (ctxt, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
               if (snapshot.hasError)
-                return Text(snapshot.error.toString());
+                return buildShowMessage(snapshot.error.toString());
               else
                 return TabBarView(
                   children: <Widget>[
@@ -41,13 +59,16 @@ class _DashboardState extends State<Dashboard> {
                 );
             }
             else
-              //till box is opened
-              return Center(
-                  child: CircularProgressIndicator(),
-                );
+              return buildLoading();
           },
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    Hive.close();
+    super.dispose();
   }
 }

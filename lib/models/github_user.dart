@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
-class GithubUser with ChangeNotifier{
+import 'user.dart';
+
+class GithubUser with ChangeNotifier {
   final String name;
   final String avatar;
   bool isBookmarked;
@@ -17,10 +19,18 @@ class GithubUser with ChangeNotifier{
     this.gists,
     this.isBookmarked = false,
   });
-  
+
   //Update the bookmark value per User
   void toogleBookmarkValue() {
     isBookmarked = !isBookmarked;
     notifyListeners();
+  }
+
+  User toUser() {
+    return User(
+      this.name,
+      this.avatar,
+      this.isBookmarked,
+    );
   }
 }

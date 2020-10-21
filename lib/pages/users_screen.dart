@@ -1,12 +1,15 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
+import 'package:states_rebuilder/states_rebuilder.dart';
 
-import '../data/github_repo.dart';
+import '../data/github_store.dart';
 import './widgets/user_card.dart';
 
+
 class UsersScreen extends StatefulWidget {
+  GithubStore githubStore;
+
   @override
   _UsersScreenState createState() => _UsersScreenState();
 }
@@ -16,63 +19,65 @@ class _UsersScreenState extends State<UsersScreen> {
   @override
   void initState(){ 
     super.initState();
-    _updateData(context);
+    //_updateData(context);
   }
 
   ///Update the data or refresh the data
-  Future<void> _updateData(BuildContext context) async {
-    try {
-      final githubRepo = Provider.of<GithubRepo>(context, listen: false);
-      await githubRepo.fetchGithubUsers();
-    } on SocketException catch (_) {
-      final alertSnackBar = SnackBar(
-        content: Text('Check Internet Connection'),
-      );
-      Scaffold.of(context).showSnackBar(alertSnackBar);
-    } catch (_) {
-      final alertSnackBar = SnackBar(
-        content: Text('Contact Support team'),
-      );
-      Scaffold.of(context).showSnackBar(alertSnackBar);
-    }
+  void _updateData() {
+    final reactiveModel = Injector.getAsReactive<GithubStore>();
+    reactiveModel.setState((store) => store.getGithubUsers(),);
+  }
+  
+  Widget buildShowMessage(String message) {
+    return Center(
+      child: Text(message),
+    );
+  }
+
+  Widget buildLoading() {
+    return Center(
+      child: CircularProgressIndicator(),
+    );
+  }
+
+  Widget buildInitialView(){
+    return Center(
+      child: IconButton(icon: Icon(Icons.sync), onPressed: () => _updateData(),),
+    );
+  }
+
+  Widget buildListeView(GithubStore store){
+    if(store == null) store = Injector.get<GithubStore>();
+    if(store.githubUsers != null || store.githubUsers.length == 0) return buildInitialView();
+    return ListView.builder(
+          itemCount: store.githubUsers.length,
+          itemBuilder: (ctxt, index) => ChangeNotifierProvider.value(
+                value: store.githubUsers[index],
+                child: UserCard(),
+              )
+          );
   }
 
   @override
   Widget build(BuildContext context) {
-    //github repository to get the data
-    final githubRepo = Provider.of<GithubRepo>(context, listen: false);
-    // return FutureBuilder(
-    //   future: _updateData(context),
-    //   builder: (ctxt, snapshot) =>
-    //       snapshot.connectionState == ConnectionState.waiting
-    //           ? Center(
-    //               //Till we fetch the users
-    //               child: CircularProgressIndicator(),
-    //             )
-    //           : RefreshIndicator(
-    //               onRefresh: () => _updateData(context),
-    //               //List of Users
-    //               child: ListView.builder(
-    //                 itemCount: githubRepo.githubUsers.length,
-    //                 itemBuilder: (ctxt, index) => ChangeNotifierProvider.value(
-    //                   value: githubRepo.githubUsers[index],
-    //                   child: UserCard(),
-    //                 )
-    //                 //UserCard(user: githubRepo.githubUsers[index]),
-    //               ),
-    //             ),
-    // );
     return RefreshIndicator(
-      onRefresh: () => _updateData(context),
+      onRefresh: () => Future.delayed(Duration(seconds: 0), _updateData),
       //List of Users
-      child: ListView.builder(
-          itemCount: githubRepo.githubUsers.length,
-          itemBuilder: (ctxt, index) => ChangeNotifierProvider.value(
-                value: githubRepo.githubUsers[index],
-                child: UserCard(),
-              )
-          //UserCard(user: githubRepo.githubUsers[index]),
-          ),
+      child: StateBuilder<GithubStore>(
+        models: [Injector.getAsReactive<GithubStore>()],
+        builder: (ctxt, reactiveModel){
+          return reactiveModel.whenConnectionState(
+            onData: (store){
+              //clear box when you fetch data again from Server
+              Hive.box('github').clear();
+              return buildListeView(store);
+            },
+            onIdle: () => buildListeView(null),
+            onError: (_) => buildShowMessage('Something Wrong Goes on !!'),
+            onWaiting: () => buildLoading(),
+          );
+        },
+      ),
     );
   }
 }

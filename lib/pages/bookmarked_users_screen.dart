@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:provider/provider.dart';
 
-import '../models/github_user.dart';
-import './widgets/user_card.dart';
+import '../models/user.dart';
+import './widgets/user_card_bookmarked.dart';
 
 class BookmarkedUsersScreen extends StatefulWidget {
   @override
@@ -30,14 +29,10 @@ class _BookmarkedUsersScreenState extends State<BookmarkedUsersScreen> {
             : ListView.builder(
                 itemCount: githubBox.length,
                 itemBuilder: (ctxt, index) {
-                  final user = githubBox.getAt(index) as GithubUser;
-                  return ChangeNotifierProvider.value(
-                    value: user,
-                    child: UserCard(index: index, useCache: true,),
+                  final user = githubBox.getAt(index) as User;
+                  return UserCardBookMarked(
+                    user,
                   );
-                  // return UserCard(
-                  //   index: index,
-                  // );
                 });
       },
     );

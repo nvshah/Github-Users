@@ -11,7 +11,7 @@ class GithubRepo{
   
   //get the list of github users
   Future<void> fetchGithubUsers() async {
-    githubUsers = await Future.wait(await githubService.getGithubUsers());
+    return Future.wait(await githubService.getGithubUsers());
     //githubUsers = await githubService.getGithubUsers();
   }
 

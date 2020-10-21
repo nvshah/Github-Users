@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:states_rebuilder/states_rebuilder.dart';
 
 
-import './data/github_repo.dart';
+import './data/github_store.dart';
 import './services/github_service.dart';
 import './pages/dashboard.dart';
 import './models/user.dart';
@@ -29,9 +29,15 @@ class MyApp extends StatelessWidget {
         accentColor: Colors.pink,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: Provider<GithubRepo>(
-        create: (_) => GithubRepo(githubService: GithubService()),
-        child: Dashboard(),
+      // home: Provider<GithubRepo>(
+      //   create: (_) => GithubRepo(githubService: GithubService()),
+      //   child: Dashboard(),
+      // ),
+      home: Injector(
+        inject: [
+          Inject<GithubStore>(() => GithubStore(githubService: GithubService())),
+        ],
+        builder: (context) => Dashboard(),
       ),
     );
   }

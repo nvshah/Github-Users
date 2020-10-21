@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:provider/provider.dart';
+import 'package:states_rebuilder/states_rebuilder.dart';
 
-import '../../models/github_user.dart';
-import '../user_details_screen.dart';
+import '../../models/user.dart';
+import '../../data/github_store.dart';
 
-class UserCard extends StatelessWidget {
-  final int index;
+class UserCardBookMarked extends StatelessWidget {
+  final User user;
 
-  UserCard({
-    this.index,
-  });
+  UserCardBookMarked(this.user);
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<GithubUser>(context);
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 8.0,
@@ -30,14 +27,15 @@ class UserCard extends StatelessWidget {
           ),
           child: GestureDetector(
             //Navigate to details page
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => UserDetailsScreen(
-                  user: user,
-                ),
-              ),
-            ),
+            // onTap: () => Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) => UserDetailsScreen(
+            //       user: user,
+            //     ),
+            //   ),
+            // ),
+            onTap: (){},
             child: ListTile(
               //Image
               leading: CircleAvatar(
@@ -53,23 +51,17 @@ class UserCard extends StatelessWidget {
                 style: Theme.of(context).textTheme.headline6,
               ),
               //bookmark
-              trailing: Consumer<GithubUser>(
-                builder: (ctxt, user, _) => IconButton(
-                  icon: Icon(user.isBookmarked
-                      ? Icons.bookmark
-                      : Icons.bookmark_border),
+              trailing: IconButton(
+                  icon: Icon(Icons.bookmark),
                   color: Theme.of(context).accentColor,
                   onPressed: () {
                     //TODO Bookmark Toggling Logic
-                    user.toogleBookmarkValue();
+                    Injector.get<GithubStore>().toggleBookMark(user.name);
+                    
                     //reflect changes locally
                     final githubBox = Hive.box('github');
-                    if (user.isBookmarked)
-                      githubBox.put(user.name, user.toUser());
-                    else
-                      githubBox.delete(user.name);
+                    githubBox.delete(user.name);
                   },
-                ),
               ),
             ),
           ),

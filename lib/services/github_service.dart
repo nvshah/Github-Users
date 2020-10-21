@@ -20,15 +20,15 @@ class GithubService {
 
       if (data.isNotEmpty) {
         return data.map((user) async{
-          final int followers = await getNumericValues(user["followers_url"]);
-          final int followings = await getNumericValues(user["following_url"]);
-          final int gists = await getNumericValues(user["gists_url"]);
+          final followers = getNumericValues(user["followers_url"]);
+          final followings = getNumericValues(user["following_url"]);
+          final gists = getNumericValues(user["gists_url"]);
           return GithubUser(
             name: user["login"],
             avatar: user["avatar_url"],
-            followers: followers,
-            followings: followings,
-            gists: gists,
+            followers: await followers,
+            followings: await followings,
+            gists: await gists,
           );
         });
       }
