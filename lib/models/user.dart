@@ -11,7 +11,7 @@ class User{
   final String avatar;
   
   @HiveField(2)
-  final String isBookmarked;
+  final bool isBookmarked;
 
   User(this.name, this.avatar, this.isBookmarked);
 }

@@ -16,7 +16,7 @@ class UserAdapter extends TypeAdapter<User> {
     return User(
       fields[0] as String,
       fields[1] as String,
-      fields[2] as String,
+      fields[2] as bool,
     );
   }
 
