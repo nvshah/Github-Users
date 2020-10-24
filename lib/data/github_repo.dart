@@ -11,12 +11,14 @@ class GithubRepo{
   
   //get the list of github users
   Future<void> fetchGithubUsers() async {
-    return Future.wait(await githubService.getGithubUsers());
+    //var githubUsersFuture = await githuS
+    githubUsers = await Future.wait(await githubService.getGithubUsers());
+    print('done');
     //githubUsers = await githubService.getGithubUsers();
   }
 
   void toggleBookMark(String userLogin){
     var user = githubUsers.firstWhere((user) => user.name == userLogin);
-    user.toogleBookmarkValue();
+    user.isBookmarked = !user.isBookmarked;
   }
 }

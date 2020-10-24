@@ -33,4 +33,12 @@ class GithubUser with ChangeNotifier {
       this.isBookmarked,
     );
   }
+
+  static GithubUser fromUser(User user){
+    return GithubUser(
+      name: user.name,
+      avatar: user.avatar,
+      isBookmarked: true,
+    );
+  }
 }

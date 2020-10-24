@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:provider/provider.dart';
 
 import 'users_screen.dart';
 import 'bookmarked_users_screen.dart';
+import '../data/github_repo.dart';
+import '../models/github_user.dart';
 
 class Dashboard extends StatefulWidget {
   @override
@@ -11,11 +14,6 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
 
-  @override
-  void initState() {
-    super.initState();
-  }
-  
   Widget buildShowMessage(String message) {
     return Center(
       child: Text(message),
@@ -48,7 +46,10 @@ class _DashboardState extends State<Dashboard> {
             if (snapshot.connectionState == ConnectionState.done) {
               if (snapshot.hasError)
                 return buildShowMessage(snapshot.error.toString());
-              else
+              else{
+                //Let initially show the cached data
+                final box = Hive.box('github');
+                Provider.of<GithubRepo>(context, listen: false).githubUsers = box.values.map((user) => GithubUser.fromUser(user)).toList();
                 return TabBarView(
                   children: <Widget>[
                     //tab1
@@ -57,8 +58,8 @@ class _DashboardState extends State<Dashboard> {
                     BookmarkedUsersScreen(),
                   ],
                 );
-            }
-            else
+              }
+            } else
               return buildLoading();
           },
         ),

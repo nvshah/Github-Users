@@ -13,7 +13,7 @@ class GithubStore{
   List<GithubUser> get githubUsers => _githubUsers;
 
   void getGithubUsers() async {
-    _githubUsers = await Future.wait(await githubService.getGithubUsers());
+    //_githubUsers = await Future.wait(await githubService.getGithubUsers());
   }
 
   void toggleBookMark(String userLogin){

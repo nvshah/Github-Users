@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:provider/provider.dart';
 import 'package:states_rebuilder/states_rebuilder.dart';
 
 import '../../models/user.dart';
-import '../../data/github_store.dart';
+import '../../data/github_repo.dart';
 
 class UserCardBookMarked extends StatelessWidget {
   final User user;
@@ -56,8 +57,8 @@ class UserCardBookMarked extends StatelessWidget {
                   color: Theme.of(context).accentColor,
                   onPressed: () {
                     //TODO Bookmark Toggling Logic
-                    Injector.get<GithubStore>().toggleBookMark(user.name);
-                    
+                    //Injector.get<GithubStore>().toggleBookMark(user.name);
+                    Provider.of<GithubRepo>(context, listen: false).toggleBookMark(user.name);
                     //reflect changes locally
                     final githubBox = Hive.box('github');
                     githubBox.delete(user.name);
